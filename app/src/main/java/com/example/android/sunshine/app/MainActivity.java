@@ -1,24 +1,29 @@
 package com.example.android.sunshine.app;
 
-import android.support.v7.app.ActionBarActivity;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+
+import com.example.android.sunshine.app.pages.ForecastFragment;
+import com.example.android.sunshine.app.stores.ForecastStore;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements ForecastFragment.Container {
+
+    ForecastStore forecastStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        forecastStore = new ForecastStore();
+        forecastStore.fetchForecast("14055", "de");
+
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, ForecastFragment.newInstance())
                     .commit();
         }
     }
@@ -45,19 +50,13 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
+    @Override
+    public ForecastStore getForecastStore() {
+        return this.forecastStore;
+    }
 
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
+    @Override
+    public void refreshButtonSelected() {
+        forecastStore.fetchForecast("14055", "de");
     }
 }
