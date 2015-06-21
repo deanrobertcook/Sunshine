@@ -5,20 +5,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.android.sunshine.app.pages.ForecastFragment;
-import com.example.android.sunshine.app.stores.ForecastStore;
 
-
-public class MainActivity extends ActionBarActivity implements ForecastFragment.Container {
-
-    ForecastStore forecastStore;
+public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        forecastStore = new ForecastStore();
-        forecastStore.fetchForecast("14055", "de");
 
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
@@ -48,15 +40,5 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public ForecastStore getForecastStore() {
-        return this.forecastStore;
-    }
-
-    @Override
-    public void refreshButtonSelected() {
-        forecastStore.fetchForecast("14055", "de");
     }
 }
