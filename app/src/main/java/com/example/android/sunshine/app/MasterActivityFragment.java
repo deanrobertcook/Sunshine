@@ -1,9 +1,11 @@
 package com.example.android.sunshine.app;
 
+import android.app.Fragment;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.preference.PreferenceManager;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,8 +36,11 @@ import java.util.ArrayList;
  */
 public class MasterActivityFragment extends Fragment {
 
-    private ArrayAdapter<String> forecastAdapter;
     public final String TAG = MasterActivityFragment.class.getSimpleName();
+
+    private ArrayAdapter<String> forecastAdapter;
+    private final String DEFAULT_POSTCODE = "14055";
+    private final String DEFAULT_COUNTRY = "de";
 
     public static MasterActivityFragment newInstance() {
         MasterActivityFragment fragment = new MasterActivityFragment();
@@ -51,13 +56,21 @@ public class MasterActivityFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.v(TAG, "onCreateOptionsMenu called");
         inflater.inflate(R.menu.forecastfragment, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-            new FetchForecastTask().execute("14055", "de");
+
+            String postcodeKey = getActivity().getResources().getString(R.string.pref_postcode_key);
+
+            String postcode = PreferenceManager
+                    .getDefaultSharedPreferences(getActivity())
+                    .getString(postcodeKey, DEFAULT_POSTCODE);
+
+            new FetchForecastTask().execute(postcode, DEFAULT_COUNTRY);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -94,7 +107,8 @@ public class MasterActivityFragment extends Fragment {
 
     class FetchForecastTask extends AsyncTask<String, Void, String[]> {
 
-        private final String BASE_URL = "http://api.openweathermap.org/data/2.5";
+        private final String SCHEME = "http";
+        private final String BASE_URL = "//api.openweathermap.org/data/2.5/forecast/daily";
 
         private final String POSTCODE_PARAM = "q";
 
@@ -124,7 +138,7 @@ public class MasterActivityFragment extends Fragment {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
-                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
+                URL url = new URL(buildURL(params));
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -178,6 +192,23 @@ public class MasterActivityFragment extends Fragment {
             return parsedJson;
         }
 
+        private String buildURL (String[] params) {
+            String postCode = params[0];
+            String countryCode = params[1];
+
+            String url = new Uri.Builder()
+                    .scheme(SCHEME)
+                    .path(BASE_URL)
+                    .appendQueryParameter(POSTCODE_PARAM, postCode + ", " + countryCode)
+                    .appendQueryParameter(UNITS_PARAM, UNITS_DEFAULT)
+                    .appendQueryParameter(FORECAST_DAYS_PARAM, Integer.toString(FORECAST_DAYS_DEFAULT))
+                    .toString();
+
+            Log.v(TAG, url);
+
+            return url;
+        }
+
         @Override
         protected void onPostExecute(String[] strings) {
             forecastAdapter.clear();
@@ -226,7 +257,14 @@ public class MasterActivityFragment extends Fragment {
             final String OWM_MIN = "min";
             final String OWM_DESCRIPTION = "main";
 
+            // Names of some other interesting elements in the JSON string
+            final String OWM_CITY = "city";
+
+
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
+            String city = forecastJson.get(OWM_CITY).toString();
+            Log.v(TAG, "City: " + city);
+
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
             // OWM returns daily forecasts based upon the local time of the city that is being

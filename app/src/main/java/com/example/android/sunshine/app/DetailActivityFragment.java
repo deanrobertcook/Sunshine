@@ -27,6 +27,5 @@ public class DetailActivityFragment extends Fragment {
         textView.setText(text);
 
         return rootView;
-
     }
 }
