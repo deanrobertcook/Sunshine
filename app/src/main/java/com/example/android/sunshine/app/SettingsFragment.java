@@ -19,6 +19,9 @@ public class SettingsFragment extends PreferenceFragment
         addPreferencesFromResource(R.xml.preferences);
 
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_postcode_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_country_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_units_key)));
+
     }
 
     /**
@@ -43,7 +46,11 @@ public class SettingsFragment extends PreferenceFragment
         String value = newValue.toString();
 
         if (preference instanceof ListPreference) {
-            //TODO logic for listPreferences
+            int indexOfValue = ((ListPreference) preference).findIndexOfValue(value);
+            String entry = ((ListPreference) preference).getEntries()[indexOfValue].toString();
+
+            preference.setSummary(entry);
+
         } else if (preference instanceof EditTextPreference) {
             preference.setSummary(value);
         }

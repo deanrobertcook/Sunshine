@@ -55,6 +55,22 @@ public class MasterActivityFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
+    private void updateWeather() {
+        String postcode = PreferenceManager
+                .getDefaultSharedPreferences(getActivity())
+                .getString(
+                        getString(R.string.pref_postcode_key),
+                        DEFAULT_POSTCODE);
+
+        new FetchForecastTask().execute(postcode, DEFAULT_COUNTRY);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Log.v(TAG, "onCreateOptionsMenu called");
         inflater.inflate(R.menu.forecastfragment, menu);
@@ -63,14 +79,7 @@ public class MasterActivityFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-
-            String postcodeKey = getActivity().getResources().getString(R.string.pref_postcode_key);
-
-            String postcode = PreferenceManager
-                    .getDefaultSharedPreferences(getActivity())
-                    .getString(postcodeKey, DEFAULT_POSTCODE);
-
-            new FetchForecastTask().execute(postcode, DEFAULT_COUNTRY);
+            updateWeather();
         }
         return super.onOptionsItemSelected(item);
     }

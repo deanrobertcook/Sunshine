@@ -9,12 +9,17 @@
         />
 
     <ListPreference
-        android:key="@string/pref_city_key"
-        android:title="@string/pref_city_title"
-        android:defaultValue="@string/pref_city_default"/>
+        android:key="@string/pref_country_key"
+        android:title="@string/pref_country_title"
+        android:defaultValue="@string/pref_country_default"
+        android:entries="@array/pref_country_entries"
+        android:entryValues="@array/pref_country_values"
+        />
 
     <ListPreference
         android:key="@string/pref_units_key"
         android:title="@string/pref_units_title"
-        android:defaultValue="@string/pref_units_default"/>
+        android:defaultValue="@string/pref_units_default"
+        android:entries="@array/pref_units_entries"
+        android:entryValues="@array/pref_units_values"/>
 </PreferenceScreen>

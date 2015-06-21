@@ -9,15 +9,15 @@
     <string name="title_activity_settings">Settings</string>
 
     <string name="pref_postcode_key">pref_postcode</string>
-    <string name="pref_city_key">pref_city</string>
+    <string name="pref_country_key">pref_city</string>
     <string name="pref_units_key">pref_units</string>
 
     <string name="pref_postcode_title">Location</string>
     <string name="pref_units_title">Units</string>
-    <string name="pref_city_title">City</string>
+    <string name="pref_country_title">Country</string>
     
     <string name="pref_postcode_default" translatable="false">14055</string>
-    <string name="pref_city_default">de</string>
+    <string name="pref_country_default">de</string>
     <string name="pref_units_default">metric</string>
 
 </resources>
