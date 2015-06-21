@@ -1,5 +1,6 @@
 package com.example.android.sunshine.app;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,13 +32,13 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ForecastFragment extends Fragment {
+public class MasterActivityFragment extends Fragment {
 
     private ArrayAdapter<String> forecastAdapter;
-    public final String TAG = ForecastFragment.class.getSimpleName();
+    public final String TAG = MasterActivityFragment.class.getSimpleName();
 
-    public static ForecastFragment newInstance() {
-        ForecastFragment fragment = new ForecastFragment();
+    public static MasterActivityFragment newInstance() {
+        MasterActivityFragment fragment = new MasterActivityFragment();
 
         return fragment;
     }
@@ -72,7 +72,7 @@ public class ForecastFragment extends Fragment {
                 new ArrayList<String>()
         );
 
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_master, container, false);
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
 
@@ -82,7 +82,11 @@ public class ForecastFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String text = forecastAdapter.getItem(position);
-                Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent()
+                        .setClass(getActivity(), DetailActivity.class)
+                        .putExtra("forecast", text);
+
+                startActivity(intent);
             }
         });
 
