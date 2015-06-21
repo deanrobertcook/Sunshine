@@ -41,6 +41,9 @@ public class MasterActivityFragment extends Fragment {
     private ArrayAdapter<String> forecastAdapter;
     private final String DEFAULT_POSTCODE = "14055";
     private final String DEFAULT_COUNTRY = "de";
+    private final String DEFAULT_UNITS = "metric";
+
+    private String selectedUnits = DEFAULT_UNITS;
 
     public static MasterActivityFragment newInstance() {
         MasterActivityFragment fragment = new MasterActivityFragment();
@@ -61,18 +64,26 @@ public class MasterActivityFragment extends Fragment {
     }
 
     private void updateWeather() {
-        String postcode = PreferenceManager
+        String postcode = getSettingValue(R.string.pref_postcode_key, DEFAULT_POSTCODE);
+        String countryCode = getSettingValue(R.string.pref_country_key, DEFAULT_COUNTRY);
+
+        String units = getSettingValue(R.string.pref_units_key, DEFAULT_UNITS);
+        selectedUnits = units;
+
+        new FetchForecastTask().execute(postcode, countryCode);
+    }
+
+    private String getSettingValue(int keyResourceId, String defaultValue) {
+        String value = PreferenceManager
                 .getDefaultSharedPreferences(getActivity())
                 .getString(
-                        getString(R.string.pref_postcode_key),
-                        DEFAULT_POSTCODE);
-
-        new FetchForecastTask().execute(postcode, DEFAULT_COUNTRY);
+                        getString(keyResourceId),
+                        defaultValue);
+        return value;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Log.v(TAG, "onCreateOptionsMenu called");
         inflater.inflate(R.menu.forecastfragment, menu);
     }
 
@@ -122,7 +133,6 @@ public class MasterActivityFragment extends Fragment {
         private final String POSTCODE_PARAM = "q";
 
         private final String UNITS_PARAM = "units";
-        private final String UNITS_DEFAULT = "metric";
 
         private final String FORECAST_DAYS_PARAM = "cnt";
         private final int FORECAST_DAYS_DEFAULT = 7;
@@ -209,7 +219,7 @@ public class MasterActivityFragment extends Fragment {
                     .scheme(SCHEME)
                     .path(BASE_URL)
                     .appendQueryParameter(POSTCODE_PARAM, postCode + ", " + countryCode)
-                    .appendQueryParameter(UNITS_PARAM, UNITS_DEFAULT)
+                    .appendQueryParameter(UNITS_PARAM, DEFAULT_UNITS)
                     .appendQueryParameter(FORECAST_DAYS_PARAM, Integer.toString(FORECAST_DAYS_DEFAULT))
                     .toString();
 
@@ -319,17 +329,23 @@ public class MasterActivityFragment extends Fragment {
                 // "temp" when working with temperature.  It confuses everybody.
                 JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
                 double high = temperatureObject.getDouble(OWM_MAX);
+                high = convertToSelectedUnits(high);
                 double low = temperatureObject.getDouble(OWM_MIN);
+                low = convertToSelectedUnits(low);
 
                 highAndLow = formatHighLows(high, low);
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
-
-            for (String s : resultStrs) {
-                Log.v(TAG, "Forecast entry: " + s);
-            }
             return resultStrs;
 
+        }
+
+        private double convertToSelectedUnits(double tempValue) {
+            if (selectedUnits.equals(DEFAULT_UNITS)) {
+                return tempValue;
+            }
+
+            return tempValue * 9.00 / 5.00 + 32.00;
         }
     }
 
