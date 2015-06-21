@@ -16,29 +16,5 @@ public class SettingsFragment extends PreferenceFragment
 
         addPreferencesFromResource(R.xml.preferences);
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.v(TAG, "registering fragment");
-        getPreferenceScreen().getSharedPreferences()
-                .registerOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.v(TAG, "unregistering fragment");
-        getPreferenceScreen().getSharedPreferences()
-                .unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        String postCodeKey = getActivity().getResources().getString(R.string.pref_postcode_key);
-        if (key.equals(postCodeKey)) {
-            String value = sharedPreferences.getString(key, "");
-            Log.v(TAG, "Value: " + value);
-        }
-    }
+    
 }
