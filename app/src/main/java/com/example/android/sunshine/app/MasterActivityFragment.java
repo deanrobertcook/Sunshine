@@ -82,9 +82,8 @@ public class MasterActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String text = forecastAdapter.getItem(position);
-                Intent intent = new Intent()
-                        .setClass(getActivity(), DetailActivity.class)
-                        .putExtra("forecast", text);
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, text);
 
                 startActivity(intent);
             }
