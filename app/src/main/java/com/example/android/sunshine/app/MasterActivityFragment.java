@@ -91,8 +91,29 @@ public class MasterActivityFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
             updateWeather();
+        } else if (item.getItemId() == R.id.action_view_location) {
+            sendUserToMaps();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sendUserToMaps() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+
+        String postcode = getSettingValue(R.string.pref_postcode_key, DEFAULT_POSTCODE);
+        String countryCode = getSettingValue(R.string.pref_country_key, DEFAULT_COUNTRY);
+
+        intent.setData(buildLocationUri(postcode, countryCode));
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivity(intent);
+        }
+
+    }
+
+    private Uri buildLocationUri(String postcode, String countryCode) {
+        return Uri.parse("geo:0,0").buildUpon()
+                .appendQueryParameter("q", postcode + "+" + countryCode)
+                .build();
     }
 
     @Override
