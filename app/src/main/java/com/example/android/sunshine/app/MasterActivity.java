@@ -82,7 +82,7 @@ public class MasterActivity extends ActionBarActivity {
             Log.d(TAG, "Num items: " + data.getCount());
             data.moveToFirst();
             while (!data.isLast()) {
-                Log.d(TAG, data.getString(0) + " | " + data.getString(1) + " | " + data.getString(2));
+//                Log.d(TAG, data.getString(0) + " | " + data.getString(1) + " | " + data.getString(2));
                 data.moveToNext();
             }
         }
