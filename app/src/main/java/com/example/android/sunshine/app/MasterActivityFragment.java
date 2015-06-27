@@ -2,6 +2,7 @@ package com.example.android.sunshine.app;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -11,13 +12,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.android.sunshine.app.data.Forecast;
-
-import java.util.ArrayList;
+import com.example.android.sunshine.app.data.WeatherContract;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -32,7 +30,6 @@ public class MasterActivityFragment extends Fragment {
     private final String DEFAULT_COUNTRY = "de";
     private final String DEFAULT_UNITS = "metric";
 
-    private String selectedUnits = DEFAULT_UNITS;
 
     public static MasterActivityFragment newInstance() {
         MasterActivityFragment fragment = new MasterActivityFragment();
@@ -53,13 +50,9 @@ public class MasterActivityFragment extends Fragment {
     }
 
     private void updateWeather() {
-        String postcode = getSettingValue(R.string.pref_postcode_key, DEFAULT_POSTCODE);
-        String countryCode = getSettingValue(R.string.pref_country_key, DEFAULT_COUNTRY);
+        String location = Utility.getPreferredLocation(getActivity());
 
-        String units = getSettingValue(R.string.pref_units_key, DEFAULT_UNITS);
-        selectedUnits = units;
-
-        new FetchWeatherTask(getActivity(), tempAdapter).execute(postcode, countryCode);
+        new FetchWeatherTask(getActivity()).execute(location);
     }
 
     private String getSettingValue(int keyResourceId, String defaultValue) {
@@ -89,46 +82,45 @@ public class MasterActivityFragment extends Fragment {
     private void sendUserToMaps() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
-        String postcode = getSettingValue(R.string.pref_postcode_key, DEFAULT_POSTCODE);
-        String countryCode = getSettingValue(R.string.pref_country_key, DEFAULT_COUNTRY);
+        String location = Utility.getPreferredLocation(getActivity());
+        Uri geoLocationResource = buildLocationUri(location);
 
-        intent.setData(buildLocationUri(postcode, countryCode));
+
+        intent.setData(geoLocationResource);
         if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
             startActivity(intent);
         }
 
     }
 
-    private Uri buildLocationUri(String postcode, String countryCode) {
+    private Uri buildLocationUri(String location) {
         return Uri.parse("geo:0,0").buildUpon()
-                .appendQueryParameter("q", postcode + "+" + countryCode)
+                .appendQueryParameter("q", location)
                 .build();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        forecastAdapter = new ForecastAdapter(
-                getActivity(),
-                new ArrayList<Forecast>()
-        );
+        String locationSetting = Utility.getPreferredLocation(getActivity());
+
+        // Sort order:  Ascending, by date.
+        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                locationSetting, System.currentTimeMillis());
+
+        Cursor cur = getActivity().getContentResolver().query(weatherForLocationUri,
+                null, null, null, sortOrder);
+
+        // The CursorAdapter will take data from our cursor and populate the ListView
+        // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
+        // up with an empty list the first time we run.
+        forecastAdapter = new ForecastAdapter(getActivity(), cur, 0);
 
         View rootView = inflater.inflate(R.layout.fragment_master, container, false);
-
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-
         listView.setAdapter(forecastAdapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Forecast forecast = forecastAdapter.getItem(position);
-//                Intent intent = new Intent(getActivity(), DetailActivity.class)
-//                        .putExtra(Intent.EXTRA_TEXT, text);
-//
-//                startActivity(intent);
-            }
-        });
 
         return rootView;
     }
