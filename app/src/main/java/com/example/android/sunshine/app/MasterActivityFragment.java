@@ -15,8 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.example.android.sunshine.app.data.Forecast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +39,7 @@ public class MasterActivityFragment extends Fragment {
 
     public final String TAG = MasterActivityFragment.class.getSimpleName();
 
-    private ArrayAdapter<String> forecastAdapter;
+    private ForecastAdapter forecastAdapter;
     private final String DEFAULT_POSTCODE = "14055";
     private final String DEFAULT_COUNTRY = "de";
     private final String DEFAULT_UNITS = "metric";
@@ -119,11 +120,9 @@ public class MasterActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        forecastAdapter = new ArrayAdapter<>(
+        forecastAdapter = new ForecastAdapter(
                 getActivity(),
-                R.layout.list_item_forecast,
-                R.id.list_item_forecast_view,
-                new ArrayList<String>()
+                new ArrayList<Forecast>()
         );
 
         View rootView = inflater.inflate(R.layout.fragment_master, container, false);
@@ -135,18 +134,18 @@ public class MasterActivityFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String text = forecastAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, text);
-
-                startActivity(intent);
+//                Forecast forecast = forecastAdapter.getItem(position);
+//                Intent intent = new Intent(getActivity(), DetailActivity.class)
+//                        .putExtra(Intent.EXTRA_TEXT, text);
+//
+//                startActivity(intent);
             }
         });
 
         return rootView;
     }
 
-    class FetchForecastTask extends AsyncTask<String, Void, String[]> {
+    class FetchForecastTask extends AsyncTask<String, Void, ArrayList<Forecast>> {
 
         private final String SCHEME = "http";
         private final String BASE_URL = "//api.openweathermap.org/data/2.5/forecast/daily";
@@ -159,7 +158,7 @@ public class MasterActivityFragment extends Fragment {
         private final int FORECAST_DAYS_DEFAULT = 7;
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected ArrayList<Forecast> doInBackground(String... params) {
 
             final String postCode = params[0];
             final String countryCode = params[0];
@@ -172,7 +171,7 @@ public class MasterActivityFragment extends Fragment {
             // Will contain the raw JSON response as a string.
             String forecastJsonStr = null;
             // Contains the parsed JSON to hand back to the adapter
-            String[] parsedJson = null;
+            ArrayList<Forecast> forecasts = null;
 
             try {
                 // Construct the URL for the OpenWeatherMap query
@@ -208,7 +207,7 @@ public class MasterActivityFragment extends Fragment {
                 }
                 forecastJsonStr = buffer.toString();
 
-                parsedJson = getWeatherDataFromJson(forecastJsonStr, 7);
+                forecasts = getWeatherDataFromJson(forecastJsonStr, 7);
             } catch (IOException e) {
                 Log.e("PlaceholderFragment", "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
@@ -229,7 +228,7 @@ public class MasterActivityFragment extends Fragment {
                 }
             }
 
-            return parsedJson;
+            return forecasts;
         }
 
         private String buildURL (String[] params) {
@@ -250,7 +249,7 @@ public class MasterActivityFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String[] strings) {
+        protected void onPostExecute(ArrayList<Forecast> strings) {
             forecastAdapter.clear();
             forecastAdapter.addAll(strings);
             //ArrayAdapter automatically notifies on change (unless that behaviour
@@ -268,25 +267,13 @@ public class MasterActivityFragment extends Fragment {
         }
 
         /**
-         * Prepare the weather high/lows for presentation.
-         */
-        private String formatHighLows(double high, double low) {
-            // For presentation, assume the user doesn't care about tenths of a degree.
-            long roundedHigh = Math.round(high);
-            long roundedLow = Math.round(low);
-
-            String highLowStr = roundedHigh + "/" + roundedLow;
-            return highLowStr;
-        }
-
-        /**
          * Take the String representing the complete forecast in JSON Format and
          * pull out the data we need to construct the Strings needed for the wireframes.
          *
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+        private ArrayList<Forecast> getWeatherDataFromJson(String forecastJsonStr, int numDays)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
@@ -324,7 +311,7 @@ public class MasterActivityFragment extends Fragment {
             // now we work exclusively in UTC
             dayTime = new Time();
 
-            String[] resultStrs = new String[numDays];
+            ArrayList<Forecast> forecasts = new ArrayList<>();
             for(int i = 0; i < weatherArray.length(); i++) {
                 // For now, using the format "Day, description, hi/low"
                 String day;
@@ -354,10 +341,15 @@ public class MasterActivityFragment extends Fragment {
                 double low = temperatureObject.getDouble(OWM_MIN);
                 low = convertToSelectedUnits(low);
 
-                highAndLow = formatHighLows(high, low);
-                resultStrs[i] = day + " - " + description + " - " + highAndLow;
+                Forecast forecast = new Forecast(
+                        day,
+                        description,
+                        (int) high,
+                        (int) low
+                );
+                forecasts.add(forecast);
             }
-            return resultStrs;
+            return forecasts;
 
         }
 

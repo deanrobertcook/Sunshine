@@ -2,6 +2,8 @@ package com.example.android.sunshine.app.data;
 
 import android.test.AndroidTestCase;
 
+import java.util.Date;
+
 public class TestPractice extends AndroidTestCase {
     /*
         This gets run before every test.
@@ -24,6 +26,8 @@ public class TestPractice extends AndroidTestCase {
         if (b > d) {
             fail("XX should never happen");
         }
+
+        System.out.println("Date represented by time: " + new Date(WeatherContract.normalizeDate(new Date().getTime())));
     }
 
     @Override
