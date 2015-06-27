@@ -1,7 +1,9 @@
 package com.example.android.sunshine.app;
 
 import android.app.Fragment;
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,7 +22,7 @@ import com.example.android.sunshine.app.data.WeatherContract;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MasterActivityFragment extends Fragment {
+public class MasterActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     public final String TAG = MasterActivityFragment.class.getSimpleName();
 
@@ -100,6 +102,12 @@ public class MasterActivityFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         String locationSetting = Utility.getPreferredLocation(getActivity());
@@ -123,5 +131,20 @@ public class MasterActivityFragment extends Fragment {
 
 
         return rootView;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
