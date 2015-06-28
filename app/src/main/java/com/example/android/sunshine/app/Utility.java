@@ -25,8 +25,8 @@ import java.util.Date;
 public class Utility {
     public static String getPreferredLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(R.string.pref_postcode_key),
-                context.getString(R.string.pref_postcode_default));
+        return prefs.getString(context.getString(R.string.pref_postcode_key), context.getString(R.string.pref_postcode_default)) +
+                "," + prefs.getString(context.getString(R.string.pref_country_key), context.getString(R.string.pref_country_default));
     }
 
     public static boolean isMetric(Context context) {
@@ -38,8 +38,8 @@ public class Utility {
 
     static String formatTemperature(double temperature, boolean isMetric) {
         double temp;
-        if ( !isMetric ) {
-            temp = 9*temperature/5+32;
+        if (!isMetric) {
+            temp = 9 * temperature / 5 + 32;
         } else {
             temp = temperature;
         }
