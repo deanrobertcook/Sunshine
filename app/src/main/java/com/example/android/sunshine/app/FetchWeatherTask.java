@@ -41,6 +41,7 @@ import java.util.Vector;
 
 public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
+    private static final String TAG = FetchWeatherTask.class.getName();
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
     private final Context mContext;
@@ -239,7 +240,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 inserted = mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, cvArray);
             }
 
-            Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
+//            Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
