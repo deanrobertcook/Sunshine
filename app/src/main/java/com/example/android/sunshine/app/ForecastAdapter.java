@@ -16,12 +16,14 @@ import com.example.android.sunshine.app.data.WeatherProjection;
  */
 public class ForecastAdapter extends CursorAdapter {
 
+    private Context context;
 
     private static final int VIEW_TYPE_TODAY = 0;
     private static final int VIEW_TYPE_OTHER = 1;
 
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+        this.context = context;
     }
 
     /**
@@ -29,7 +31,7 @@ public class ForecastAdapter extends CursorAdapter {
      */
     private String formatTemp(double temp) {
         boolean isMetric = Utility.isMetric(mContext);
-        String tempString = Utility.formatTemperature(temp, isMetric);
+        String tempString = Utility.formatTemperature(context, temp, isMetric);
         return tempString;
     }
 
