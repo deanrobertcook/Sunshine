@@ -60,7 +60,10 @@ public class ForecastAdapter extends CursorAdapter {
             layoutId = R.layout.list_item_forecast;
         }
 
-        return LayoutInflater.from(context).inflate(layoutId, parent, false);
+        View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
+        return view;
     }
 
     /*
@@ -68,21 +71,34 @@ public class ForecastAdapter extends CursorAdapter {
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        TextView dayTextView = (TextView) view.findViewById(R.id.tv__list_forecast_day);
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
+
         String date = Utility.getFriendlyDayString(
                 context,
                 cursor.getLong(WeatherProjection.COL_WEATHER_DATE));
-        dayTextView.setText(date);
+        viewHolder.day.setText(date);
 
-        TextView descTextView = (TextView) view.findViewById(R.id.tv__list_forecast_description);
-        descTextView.setText(cursor.getString(WeatherProjection.COL_WEATHER_DESC));
+        viewHolder.description.setText(cursor.getString(WeatherProjection.COL_WEATHER_DESC));
 
-        TextView maxTextView = (TextView) view.findViewById(R.id.tv__list_forecast_max);
         double max = cursor.getDouble(WeatherProjection.COL_WEATHER_MAX_TEMP);
-        maxTextView.setText(formatTemp(max));
+        viewHolder.max.setText(formatTemp(max));
 
-        TextView minTextView = (TextView) view.findViewById(R.id.tv__list_forecast_min);
         double min = cursor.getDouble(WeatherProjection.COL_WEATHER_MIN_TEMP);
-        minTextView.setText(formatTemp(min));
+        viewHolder.min.setText(formatTemp(min));
+    }
+
+    public static class ViewHolder {
+        public TextView day;
+        public TextView description;
+        public TextView max;
+        public TextView min;
+
+        public ViewHolder(View view) {
+            day = (TextView) view.findViewById(R.id.tv__list_forecast_day);
+            description = (TextView) view.findViewById(R.id.tv__list_forecast_description);
+            max = (TextView) view.findViewById(R.id.tv__list_forecast_max);
+            min = (TextView) view.findViewById(R.id.tv__list_forecast_min);
+
+        }
     }
 }
