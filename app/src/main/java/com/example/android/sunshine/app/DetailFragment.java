@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.sunshine.app.data.WeatherContract;
@@ -25,11 +26,11 @@ import com.example.android.sunshine.app.data.WeatherContract;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int DETAIL_FORECAST_LOADER_ID = 0;
+    private static final String CURRENT_URI = "CURRENT_URI";
     private final String HASHTAG = "#SunshineApp";
-    private String forecastString;
 
     private ShareActionProvider shareActionProvider;
 
@@ -48,13 +49,14 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
             WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
             WeatherContract.WeatherEntry.COLUMN_DEGREES,
-            WeatherContract.WeatherEntry.COLUMN_PRESSURE
+            WeatherContract.WeatherEntry.COLUMN_PRESSURE,
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
 
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
     // must change.
-    public static final int COL_WEATHER_ID = 0;
+    public static final int COL_WEATHER_TABLE_ID = 0;
     public static final int COL_WEATHER_DATE = 1;
     public static final int COL_WEATHER_DESC = 2;
     public static final int COL_WEATHER_MAX_TEMP = 3;
@@ -63,9 +65,23 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     public static final int COL_WIND_SPEED = 6;
     public static final int COL_WIND_DEGREES = 7;
     public static final int COL_PRESSURE = 8;
+    public static final int COL_WEATHER_API_ID = 9;
 
-    public DetailActivityFragment() {
+
+    public static DetailFragment newInstance(Uri itemUri) {
+        DetailFragment detailFragment = new DetailFragment();
+        Bundle args = new Bundle();
+        args.putString(CURRENT_URI, itemUri.toString());
+        detailFragment.setArguments(args);
+        return detailFragment;
+    }
+
+    public DetailFragment() {
         setHasOptionsMenu(true);
+    }
+
+    public Uri getCurrentItemUri() {
+        return Uri.parse(getArguments().getString(CURRENT_URI));
     }
 
     @Override
@@ -90,14 +106,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, forecastString + HASHTAG);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, HASHTAG);
         return shareIntent;
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Intent intent = getActivity().getIntent();
-        Uri itemUri = intent.getData();
+        Uri itemUri = getCurrentItemUri();
 
         return new CursorLoader(
                 getActivity(),
@@ -114,39 +129,43 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        data.moveToFirst(); //needed?
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        cursor.moveToFirst(); //needed?
 
         TextView day = (TextView) getView().findViewById(R.id.tv__detail_day);
         String dayStr = Utility.getDayName(getActivity(),
-                data.getLong(COL_WEATHER_DATE));
+                cursor.getLong(COL_WEATHER_DATE));
         day.setText(dayStr);
 
         TextView date = (TextView) getView().findViewById(R.id.tv__detail_date);
-        String dateStr = Utility.formatDate(data.getLong(COL_WEATHER_DATE));
+        String dateStr = Utility.formatDate(cursor.getLong(COL_WEATHER_DATE));
         date.setText(dateStr);
 
         TextView max = (TextView) getView().findViewById(R.id.tv__detail_max);
         String maxStr = Utility.formatTemperature(getActivity(),
-                data.getDouble(COL_WEATHER_MAX_TEMP));
+                cursor.getDouble(COL_WEATHER_MAX_TEMP));
         max.setText(maxStr);
 
         TextView min = (TextView) getView().findViewById(R.id.tv__detail_min);
         String minStr = Utility.formatTemperature(getActivity(),
-                data.getDouble(COL_WEATHER_MIN_TEMP));
+                cursor.getDouble(COL_WEATHER_MIN_TEMP));
         min.setText(minStr);
 
         TextView humidity = (TextView) getView().findViewById(R.id.tv__detail_humidity);
-        humidity.setText(data.getString(COL_HUMIDITY));
+        humidity.setText(cursor.getString(COL_HUMIDITY));
 
         TextView wind = (TextView) getView().findViewById(R.id.tv__detail_wind);
-        wind.setText(data.getString(COL_WIND_SPEED));
+        wind.setText(cursor.getString(COL_WIND_SPEED));
 
         TextView pressure = (TextView) getView().findViewById(R.id.tv__detail_pressure);
-        pressure.setText(data.getString(COL_PRESSURE));
+        pressure.setText(cursor.getString(COL_PRESSURE));
 
         TextView description = (TextView) getView().findViewById(R.id.tv__detail_description);
-        description.setText(data.getString(COL_WEATHER_DESC));
+        description.setText(cursor.getString(COL_WEATHER_DESC));
+
+        ImageView image = (ImageView) getView().findViewById(R.id.iv__detail_image);
+        int weatherId = cursor.getInt(COL_WEATHER_API_ID);
+        image.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
     }
 
     @Override

@@ -65,20 +65,20 @@ public class ForecastAdapter extends CursorAdapter {
 
         String date = Utility.getFriendlyDayString(
                 context,
-                cursor.getLong(MasterActivityFragment.COL_WEATHER_DATE));
+                cursor.getLong(MasterFragment.COL_WEATHER_DATE));
         viewHolder.day.setText(date);
 
-        String description = cursor.getString(MasterActivityFragment.COL_WEATHER_DESC);
+        String description = cursor.getString(MasterFragment.COL_WEATHER_DESC);
         viewHolder.description.setText(description);
 
-        double max = cursor.getDouble(MasterActivityFragment.COL_WEATHER_MAX_TEMP);
+        double max = cursor.getDouble(MasterFragment.COL_WEATHER_MAX_TEMP);
         viewHolder.max.setText(Utility.formatTemperature(mContext, max));
 
-        double min = cursor.getDouble(MasterActivityFragment.COL_WEATHER_MIN_TEMP);
+        double min = cursor.getDouble(MasterFragment.COL_WEATHER_MIN_TEMP);
         viewHolder.min.setText(Utility.formatTemperature(mContext, min));
 
-        int weatherId = cursor.getInt(MasterActivityFragment.COL_WEATHER_API_ID);
-        int drawableResId = -1;
+        int weatherId = cursor.getInt(MasterFragment.COL_WEATHER_API_ID);
+        int drawableResId;
         int cursorPos = cursor.getPosition();
         if (getItemViewType(cursorPos) == VIEW_TYPE_TODAY) {
             drawableResId = Utility.getArtResourceForWeatherCondition(weatherId);

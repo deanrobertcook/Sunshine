@@ -1,9 +1,9 @@
 package com.example.android.sunshine.app;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.android.sunshine.app.data.WeatherContract;
@@ -23,17 +22,14 @@ import com.example.android.sunshine.app.data.WeatherContract;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MasterActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MasterFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     //IDs for each loader have to be unique within a given activity (or fragment?)
     private static final int FORECAST_LOADER_ID = 0;
-    public final String TAG = MasterActivityFragment.class.getSimpleName();
+    public final String TAG = MasterFragment.class.getSimpleName();
+    private ContainingActivity container;
 
     private ForecastAdapter forecastAdapter;
-    private ArrayAdapter<String> tempAdapter;
-    private final String DEFAULT_POSTCODE = "14055";
-    private final String DEFAULT_COUNTRY = "de";
-    private final String DEFAULT_UNITS = "metric";
 
     public static final String[] FORECAST_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
@@ -61,9 +57,13 @@ public class MasterActivityFragment extends Fragment implements LoaderManager.Lo
     public static final int COL_WEATHER_API_ID = 5;
 
 
-    public static MasterActivityFragment newInstance() {
-        MasterActivityFragment fragment = new MasterActivityFragment();
+    public static MasterFragment newInstance() {
+        MasterFragment fragment = new MasterFragment();
         return fragment;
+    }
+
+    public void setContainer(ContainingActivity container) {
+        this.container = container;
     }
 
     @Override
@@ -88,6 +88,18 @@ public class MasterActivityFragment extends Fragment implements LoaderManager.Lo
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        container = (ContainingActivity) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.container = null;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
             updateWeather();
@@ -102,7 +114,7 @@ public class MasterActivityFragment extends Fragment implements LoaderManager.Lo
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         forecastAdapter = new ForecastAdapter(getActivity(), null, 0);
 
@@ -114,21 +126,20 @@ public class MasterActivityFragment extends Fragment implements LoaderManager.Lo
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = forecastAdapter.getCursor();
-                cursor.moveToPosition(position);
-                long date = cursor.getLong(COL_WEATHER_DATE);
-
-                Uri itemUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
-                        Utility.getPreferredLocation(getActivity()), date
-                );
-
-                Intent intent = new Intent(getActivity(), DetailActivity.class)
-                        .setData(itemUri);
-
-                startActivity(intent);
+                Uri itemUri = getItemUriFromCursor(cursor, position);
+                MasterFragment.this.container.onItemSelected(itemUri);
             }
         });
 
         return rootView;
+    }
+
+    private Uri getItemUriFromCursor(Cursor cursor, int itemPos) {
+        cursor.moveToPosition(itemPos);
+        long date = cursor.getLong(COL_WEATHER_DATE);
+        return WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                Utility.getPreferredLocation(getActivity()), date
+        );
     }
 
     @Override
@@ -150,12 +161,22 @@ public class MasterActivityFragment extends Fragment implements LoaderManager.Lo
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        forecastAdapter.swapCursor(data);
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        forecastAdapter.swapCursor(cursor);
+        //get the first element from the list of forecasts to give the detail
+        //activity a default forecast item on tablet views
+        Uri itemUri = getItemUriFromCursor(cursor, 0);
+        container.onFirstItemLoaded(itemUri);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         forecastAdapter.swapCursor(null);
+    }
+
+    interface ContainingActivity {
+        void onFirstItemLoaded(Uri itemUri);
+
+        void onItemSelected(Uri itemUri);
     }
 }

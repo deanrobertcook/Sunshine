@@ -10,12 +10,13 @@ import android.view.MenuItem;
 import timber.log.Timber;
 
 
-public class MasterActivity extends ActionBarActivity {
+public class MasterActivity extends ActionBarActivity implements MasterFragment.ContainingActivity {
 
     public static final String TAG = MasterActivity.class.getName();
 
-    private static final String MASTER_FRAGMENT_TAG = MasterActivityFragment.class.getName();
+    private static final String DETAIL_FRAGMENT_TAG = DetailFragment.class.getName();
     private String currentLocation;
+    private boolean twoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,14 +25,13 @@ public class MasterActivity extends ActionBarActivity {
             Timber.plant(new Timber.DebugTree());
         }
         setContentView(R.layout.activity_master);
-
-        if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, MasterActivityFragment.newInstance(), MASTER_FRAGMENT_TAG)
-                    .commit();
-        }
-
         currentLocation = Utility.getPreferredLocation(this);
+
+        if (findViewById(R.id.weather_detail_container) != null) {
+            twoPane = true;
+        } else {
+            twoPane = false;
+        }
     }
 
     @Override
@@ -52,8 +52,8 @@ public class MasterActivity extends ActionBarActivity {
         super.onResume();
         String newLocation = Utility.getPreferredLocation(this);
         if (currentLocation != newLocation) {
-            MasterActivityFragment masterFragment = (MasterActivityFragment)
-                    getFragmentManager().findFragmentByTag(MASTER_FRAGMENT_TAG);
+            MasterFragment masterFragment = (MasterFragment)
+                    getFragmentManager().findFragmentById(R.id.fragment_master);
 
             currentLocation = newLocation;
             masterFragment.onLocationChanged();
@@ -110,5 +110,32 @@ public class MasterActivity extends ActionBarActivity {
         return Uri.parse("geo:0,0").buildUpon()
                 .appendQueryParameter("q", location)
                 .build();
+    }
+
+    @Override
+    public void onFirstItemLoaded(Uri itemUri) {
+        //callback for getting the first loaded forecast item as a default first
+        //view for tablets
+        if (twoPane) {
+            setDetailFragment(itemUri);
+        }
+    }
+
+    @Override
+    public void onItemSelected(Uri itemUri) {
+        if (twoPane) { //switch out the detail fragment
+            setDetailFragment(itemUri);
+        } else { //or start the new activity
+            Intent intent = new Intent(this, DetailActivity.class)
+                    .setData(itemUri);
+
+            startActivity(intent);
+        }
+    }
+
+    private void setDetailFragment(Uri itemUri) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.weather_detail_container, DetailFragment.newInstance(itemUri))
+                .commit();
     }
 }
