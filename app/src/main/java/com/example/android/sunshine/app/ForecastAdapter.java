@@ -20,28 +20,13 @@ public class ForecastAdapter extends CursorAdapter {
     }
 
     /**
-     * Prepare the weather high/lows for presentation.
+     * Prepare a temperature for presentation.
      */
-    private String formatHighLows(double high, double low) {
+    private String formatTemp(double temp) {
         boolean isMetric = Utility.isMetric(mContext);
-        String highLowStr = Utility.formatTemperature(high, isMetric) + "/" + Utility.formatTemperature(low, isMetric);
-        return highLowStr;
+        String tempString = Utility.formatTemperature(temp, isMetric);
+        return tempString;
     }
-
-    /*
-        This is ported from FetchWeatherTask --- but now we go straight from the cursor to the
-        string.
-     */
-    private String convertCursorRowToUXFormat(Cursor cursor) {
-        String highAndLow = formatHighLows(
-                cursor.getDouble(WeatherProjection.COL_WEATHER_MAX_TEMP),
-                cursor.getDouble(WeatherProjection.COL_WEATHER_MIN_TEMP));
-
-        return Utility.formatDate(cursor.getLong(WeatherProjection.COL_WEATHER_DATE)) +
-                " - " + cursor.getString(WeatherProjection.COL_WEATHER_DESC) +
-                " - " + highAndLow;
-    }
-
     /*
         Remember that these views are reused as needed.
      */
@@ -58,15 +43,20 @@ public class ForecastAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         TextView dayTextView = (TextView) view.findViewById(R.id.tv__list_forecast_day);
-        dayTextView.setText(cursor.getString(WeatherProjection.COL_WEATHER_DATE));
+        String date = Utility.getFriendlyDayString(
+                context,
+                cursor.getLong(WeatherProjection.COL_WEATHER_DATE));
+        dayTextView.setText(date);
 
         TextView descTextView = (TextView) view.findViewById(R.id.tv__list_forecast_description);
         descTextView.setText(cursor.getString(WeatherProjection.COL_WEATHER_DESC));
 
         TextView maxTextView = (TextView) view.findViewById(R.id.tv__list_forecast_max);
-        maxTextView.setText(cursor.getString(WeatherProjection.COL_WEATHER_MAX_TEMP));
+        double max = cursor.getDouble(WeatherProjection.COL_WEATHER_MAX_TEMP);
+        maxTextView.setText(formatTemp(max));
 
         TextView minTextView = (TextView) view.findViewById(R.id.tv__list_forecast_min);
-        minTextView.setText(cursor.getString(WeatherProjection.COL_WEATHER_MIN_TEMP));
+        double min = cursor.getDouble(WeatherProjection.COL_WEATHER_MIN_TEMP);
+        minTextView.setText(formatTemp(min));
     }
 }
