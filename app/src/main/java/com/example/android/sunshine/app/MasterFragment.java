@@ -1,13 +1,13 @@
 package com.example.android.sunshine.app;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,7 +26,10 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
 
     //IDs for each loader have to be unique within a given activity (or fragment?)
     private static final int FORECAST_LOADER_ID = 0;
+    private static final String SELECTED_ITEM_KEY = "SELECTED ITEM POSITION";
+
     public final String TAG = MasterFragment.class.getSimpleName();
+
     private ContainingActivity container;
 
     private ForecastAdapter forecastAdapter;
@@ -56,6 +59,9 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int COL_WEATHER_MIN_TEMP = 4;
     public static final int COL_WEATHER_API_ID = 5;
 
+    private int savedItemPos = ListView.INVALID_POSITION;
+    private ListView listView;
+
 
     public static MasterFragment newInstance() {
         MasterFragment fragment = new MasterFragment();
@@ -70,7 +76,13 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        //returns 0 if nothing saved.
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_ITEM_KEY)) {
+            savedItemPos = savedInstanceState.getInt(SELECTED_ITEM_KEY);
+        }
     }
+
 
     private void updateWeather() {
         String location = Utility.getPreferredLocation(getActivity());
@@ -114,12 +126,20 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
+    public void onSaveInstanceState(Bundle outState) {
+        if (savedItemPos != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_ITEM_KEY, savedItemPos);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         forecastAdapter = new ForecastAdapter(getActivity(), null, 0);
 
         View rootView = inflater.inflate(R.layout.fragment_master, container, false);
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(forecastAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -128,8 +148,13 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
                 Cursor cursor = forecastAdapter.getCursor();
                 Uri itemUri = getItemUriFromCursor(cursor, position);
                 MasterFragment.this.container.onItemSelected(itemUri);
+                savedItemPos = position;
             }
         });
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_ITEM_KEY)) {
+            savedItemPos = savedInstanceState.getInt(SELECTED_ITEM_KEY);
+        }
 
         return rootView;
     }
@@ -163,10 +188,10 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         forecastAdapter.swapCursor(cursor);
-        //get the first element from the list of forecasts to give the detail
-        //activity a default forecast item on tablet views
-        Uri itemUri = getItemUriFromCursor(cursor, 0);
-        container.onFirstItemLoaded(itemUri);
+
+        if (savedItemPos != ListView.INVALID_POSITION) {
+            listView.smoothScrollToPosition(savedItemPos);
+        }
     }
 
     @Override
@@ -175,8 +200,6 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     interface ContainingActivity {
-        void onFirstItemLoaded(Uri itemUri);
-
         void onItemSelected(Uri itemUri);
     }
 }

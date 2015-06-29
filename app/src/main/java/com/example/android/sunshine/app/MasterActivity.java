@@ -7,6 +7,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.android.sunshine.app.data.WeatherContract;
+
 import timber.log.Timber;
 
 
@@ -29,6 +31,11 @@ public class MasterActivity extends ActionBarActivity implements MasterFragment.
 
         if (findViewById(R.id.weather_detail_container) != null) {
             twoPane = true;
+            Uri firstItemUri = WeatherContract.WeatherEntry
+                    .buildWeatherLocationWithDate(currentLocation, System.currentTimeMillis());
+            if (savedInstanceState == null) {
+                setDetailFragment(firstItemUri);
+            }
         } else {
             twoPane = false;
         }
@@ -51,12 +58,22 @@ public class MasterActivity extends ActionBarActivity implements MasterFragment.
     protected void onResume() {
         super.onResume();
         String newLocation = Utility.getPreferredLocation(this);
-        if (currentLocation != newLocation) {
+        if (currentLocation != null && currentLocation != newLocation) {
             MasterFragment masterFragment = (MasterFragment)
-                    getFragmentManager().findFragmentById(R.id.fragment_master);
+                    getSupportFragmentManager().findFragmentById(R.id.fragment_master);
+            if (masterFragment != null) {
+                masterFragment.onLocationChanged();
+            }
+
+            DetailFragment detailFragment = (DetailFragment)
+                    getSupportFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
+
+            if (detailFragment != null) {
+                detailFragment.onLocationChanged(newLocation);
+            }
+
 
             currentLocation = newLocation;
-            masterFragment.onLocationChanged();
         }
     }
 
@@ -113,15 +130,6 @@ public class MasterActivity extends ActionBarActivity implements MasterFragment.
     }
 
     @Override
-    public void onFirstItemLoaded(Uri itemUri) {
-        //callback for getting the first loaded forecast item as a default first
-        //view for tablets
-        if (twoPane) {
-            setDetailFragment(itemUri);
-        }
-    }
-
-    @Override
     public void onItemSelected(Uri itemUri) {
         if (twoPane) { //switch out the detail fragment
             setDetailFragment(itemUri);
@@ -135,7 +143,8 @@ public class MasterActivity extends ActionBarActivity implements MasterFragment.
 
     private void setDetailFragment(Uri itemUri) {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.weather_detail_container, DetailFragment.newInstance(itemUri))
+                .replace(R.id.weather_detail_container,
+                        DetailFragment.newInstance(itemUri), DETAIL_FRAGMENT_TAG)
                 .commit();
     }
 }

@@ -31,6 +31,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int DETAIL_FORECAST_LOADER_ID = 0;
     private static final String CURRENT_URI = "CURRENT_URI";
     private final String HASHTAG = "#SunshineApp";
+    private Uri currentItemUri;
 
     private ShareActionProvider shareActionProvider;
 
@@ -68,6 +69,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int COL_WEATHER_API_ID = 9;
 
 
+    private TextView day;
+    private TextView date;
+    private TextView max;
+    private TextView min;
+    private TextView humidity;
+    private TextView wind;
+    private TextView pressure;
+    private TextView description;
+    private ImageView image;
+
+
     public static DetailFragment newInstance(Uri itemUri) {
         DetailFragment detailFragment = new DetailFragment();
         Bundle args = new Bundle();
@@ -81,7 +93,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     public Uri getCurrentItemUri() {
-        return Uri.parse(getArguments().getString(CURRENT_URI));
+        if (currentItemUri == null) {
+            return Uri.parse(getArguments().getString(CURRENT_URI));
+        }
+        return currentItemUri;
+
     }
 
     @Override
@@ -94,11 +110,26 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            currentItemUri = arguments.getParcelable(CURRENT_URI);
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+
+        day = (TextView) rootView.findViewById(R.id.tv__detail_day);
+        date = (TextView) rootView.findViewById(R.id.tv__detail_date);
+        max = (TextView) rootView.findViewById(R.id.tv__detail_max);
+        min = (TextView) rootView.findViewById(R.id.tv__detail_min);
+        humidity = (TextView) rootView.findViewById(R.id.tv__detail_humidity);
+        wind = (TextView) rootView.findViewById(R.id.tv__detail_wind);
+        pressure = (TextView) rootView.findViewById(R.id.tv__detail_pressure);
+        description = (TextView) rootView.findViewById(R.id.tv__detail_description);
+        image = (ImageView) rootView.findViewById(R.id.iv__detail_image);
+
         return rootView;
     }
 
@@ -130,45 +161,42 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        cursor.moveToFirst(); //needed?
+        cursor.moveToFirst(); //needed? - YES
 
-        TextView day = (TextView) getView().findViewById(R.id.tv__detail_day);
         String dayStr = Utility.getDayName(getActivity(),
                 cursor.getLong(COL_WEATHER_DATE));
         day.setText(dayStr);
 
-        TextView date = (TextView) getView().findViewById(R.id.tv__detail_date);
         String dateStr = Utility.formatDate(cursor.getLong(COL_WEATHER_DATE));
         date.setText(dateStr);
 
-        TextView max = (TextView) getView().findViewById(R.id.tv__detail_max);
         String maxStr = Utility.formatTemperature(getActivity(),
                 cursor.getDouble(COL_WEATHER_MAX_TEMP));
         max.setText(maxStr);
 
-        TextView min = (TextView) getView().findViewById(R.id.tv__detail_min);
         String minStr = Utility.formatTemperature(getActivity(),
                 cursor.getDouble(COL_WEATHER_MIN_TEMP));
         min.setText(minStr);
 
-        TextView humidity = (TextView) getView().findViewById(R.id.tv__detail_humidity);
         humidity.setText(cursor.getString(COL_HUMIDITY));
 
-        TextView wind = (TextView) getView().findViewById(R.id.tv__detail_wind);
         wind.setText(cursor.getString(COL_WIND_SPEED));
 
-        TextView pressure = (TextView) getView().findViewById(R.id.tv__detail_pressure);
         pressure.setText(cursor.getString(COL_PRESSURE));
 
-        TextView description = (TextView) getView().findViewById(R.id.tv__detail_description);
         description.setText(cursor.getString(COL_WEATHER_DESC));
 
-        ImageView image = (ImageView) getView().findViewById(R.id.iv__detail_image);
         int weatherId = cursor.getInt(COL_WEATHER_API_ID);
         image.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    public void onLocationChanged(String locationSetting) {
+        long date = WeatherContract.WeatherEntry.getDateFromUri(getCurrentItemUri());
+        currentItemUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationSetting, date);
+        getLoaderManager().restartLoader(DETAIL_FORECAST_LOADER_ID, null, this);
     }
 }
