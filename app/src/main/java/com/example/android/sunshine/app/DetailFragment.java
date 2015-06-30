@@ -113,10 +113,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            currentItemUri = arguments.getParcelable(CURRENT_URI);
-        }
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 

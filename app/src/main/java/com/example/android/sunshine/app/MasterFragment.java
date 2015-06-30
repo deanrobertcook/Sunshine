@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -62,14 +63,9 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
     private int savedItemPos = ListView.INVALID_POSITION;
     private ListView listView;
 
-
-    public static MasterFragment newInstance() {
-        MasterFragment fragment = new MasterFragment();
-        return fragment;
-    }
-
-    public void setContainer(ContainingActivity container) {
-        this.container = container;
+    public MasterFragment() {
+        Bundle args = new Bundle();
+        setArguments(args);
     }
 
     @Override
@@ -191,6 +187,10 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
 
         if (savedItemPos != ListView.INVALID_POSITION) {
             listView.smoothScrollToPosition(savedItemPos);
+
+            if (listView.getChildAt(savedItemPos) == null) {
+                Log.d(TAG, "Still null");
+            }
         }
     }
 

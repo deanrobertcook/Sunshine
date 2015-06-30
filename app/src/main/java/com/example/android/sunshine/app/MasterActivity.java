@@ -15,8 +15,10 @@ import timber.log.Timber;
 public class MasterActivity extends ActionBarActivity implements MasterFragment.ContainingActivity {
 
     public static final String TAG = MasterActivity.class.getName();
+    public static final String USE_SPECIAL_DAY_KEY = "USE SPECIAL DAY";
 
     private static final String DETAIL_FRAGMENT_TAG = DetailFragment.class.getName();
+
     private String currentLocation;
     private boolean twoPane;
 
@@ -38,6 +40,13 @@ public class MasterActivity extends ActionBarActivity implements MasterFragment.
             }
         } else {
             twoPane = false;
+            MasterFragment masterFragment = (MasterFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.fragment_master);
+
+            //The fragment is already active since it is defined in the XML and attached on
+            //setContentView above
+            Bundle args = masterFragment.getArguments();
+            args.putBoolean(USE_SPECIAL_DAY_KEY, true);
         }
     }
 

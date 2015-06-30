@@ -16,8 +16,9 @@ import android.widget.TextView;
 public class ForecastAdapter extends CursorAdapter {
 
     private static final int VIEW_TYPE_TODAY = 0;
-    private static final int VIEW_TYPE_OTHER = 1;
+    private static final int VIEW_TYPE_REGULAR_DAY = 1;
     private static final String TAG = ForecastAdapter.class.getName();
+    private boolean useSpecialTodayLayout;
 
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -25,7 +26,7 @@ public class ForecastAdapter extends CursorAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0 ? VIEW_TYPE_TODAY : VIEW_TYPE_OTHER;
+        return (position == 0 && useSpecialTodayLayout) ? VIEW_TYPE_TODAY : VIEW_TYPE_REGULAR_DAY;
     }
 
     /*
@@ -34,6 +35,10 @@ public class ForecastAdapter extends CursorAdapter {
     @Override
     public int getViewTypeCount() {
         return 2;
+    }
+
+    public void setUseSpecialTodayLayout(boolean useSpecialTodayLayout) {
+        this.useSpecialTodayLayout = useSpecialTodayLayout;
     }
 
     /*
@@ -46,7 +51,7 @@ public class ForecastAdapter extends CursorAdapter {
 
         if (viewType == VIEW_TYPE_TODAY) {
             layoutId = R.layout.list_item_forecast_today;
-        } else { //if (viewType == VIEW_TYPE_OTHER) {
+        } else { //if (viewType == VIEW_TYPE_REGULAR_DAY) {
             layoutId = R.layout.list_item_forecast;
         }
 
@@ -82,7 +87,7 @@ public class ForecastAdapter extends CursorAdapter {
         int cursorPos = cursor.getPosition();
         if (getItemViewType(cursorPos) == VIEW_TYPE_TODAY) {
             drawableResId = Utility.getArtResourceForWeatherCondition(weatherId);
-        } else {// if (getItemViewType(cursorPos) == VIEW_TYPE_OTHER) {
+        } else {// if (getItemViewType(cursorPos) == VIEW_TYPE_REGULAR_DAY) {
             drawableResId = Utility.getIconResourceForWeatherCondition(weatherId);
         }
         viewHolder.image.setImageResource(drawableResId);
