@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 /**
@@ -19,6 +20,7 @@ public class ForecastAdapter extends CursorAdapter {
     private static final int VIEW_TYPE_REGULAR_DAY = 1;
     private static final String TAG = ForecastAdapter.class.getName();
     private boolean useSpecialTodayLayout;
+    private int selectedItemPos;
 
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -27,6 +29,10 @@ public class ForecastAdapter extends CursorAdapter {
     @Override
     public int getItemViewType(int position) {
         return (position == 0 && useSpecialTodayLayout) ? VIEW_TYPE_TODAY : VIEW_TYPE_REGULAR_DAY;
+    }
+
+    public void setActivatedItem(int itemPosition) {
+        this.selectedItemPos = itemPosition;
     }
 
     /*
@@ -58,6 +64,7 @@ public class ForecastAdapter extends CursorAdapter {
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
+
         return view;
     }
 

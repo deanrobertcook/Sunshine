@@ -42,11 +42,7 @@ public class MasterActivity extends ActionBarActivity implements MasterFragment.
             twoPane = false;
             MasterFragment masterFragment = (MasterFragment)
                     getSupportFragmentManager().findFragmentById(R.id.fragment_master);
-
-            //The fragment is already active since it is defined in the XML and attached on
-            //setContentView above
-            Bundle args = masterFragment.getArguments();
-            args.putBoolean(USE_SPECIAL_DAY_KEY, true);
+            masterFragment.setUseSpecialTodayLayout(true);
         }
     }
 

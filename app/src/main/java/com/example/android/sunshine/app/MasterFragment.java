@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -62,11 +61,7 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
 
     private int savedItemPos = ListView.INVALID_POSITION;
     private ListView listView;
-
-    public MasterFragment() {
-        Bundle args = new Bundle();
-        setArguments(args);
-    }
+    private boolean specialTodayLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -129,6 +124,10 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
         super.onSaveInstanceState(outState);
     }
 
+    public void setUseSpecialTodayLayout(boolean specialTodayLayout) {
+        this.specialTodayLayout = specialTodayLayout;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -183,14 +182,12 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        forecastAdapter.setUseSpecialTodayLayout(specialTodayLayout);
         forecastAdapter.swapCursor(cursor);
+        forecastAdapter.setActivatedItem(savedItemPos);
 
         if (savedItemPos != ListView.INVALID_POSITION) {
             listView.smoothScrollToPosition(savedItemPos);
-
-            if (listView.getChildAt(savedItemPos) == null) {
-                Log.d(TAG, "Still null");
-            }
         }
     }
 
