@@ -6,4 +6,11 @@
     <dimen name="text_size_2">20sp</dimen>
     <dimen name="detail_item_padding">8dp</dimen>
     <dimen name="detail_temp_text_size">40sp</dimen>
+    <dimen name="single_padding">6dp</dimen>
+    <dimen name="double_padding">12dp</dimen>
+    <dimen name="left_image_margin">60dp</dimen>
+
+
+    <dimen name="max_temperature_reading">72sp</dimen>
+    <dimen name="min_temperature_reading">36sp</dimen>
 </resources>

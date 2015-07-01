@@ -26,4 +26,32 @@
 
     </style>
 
+    <!-- List Item styles -->
+
+    <style name="TodayListItemText">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textAppearance">?android:textAppearanceLarge</item>
+    </style>
+
+    <style name="TodayListItemMax">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">@dimen/max_temperature_reading</item>
+    </style>
+
+    <style name="TodayListItemMin">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">@dimen/min_temperature_reading</item>
+        <item name="android:paddingLeft">@dimen/double_padding</item>
+    </style>
+
+    <style name="NormalListItemTop">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textAppearance">?android:textAppearanceLarge</item>
+    </style>
+
+    <style name="NormalListItemBottom">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+    </style>
+
 </resources>
