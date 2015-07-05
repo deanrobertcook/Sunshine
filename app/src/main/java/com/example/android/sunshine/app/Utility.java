@@ -45,15 +45,10 @@ public class Utility {
     /**
      * Prepare a temperature for presentation.
      */
-    public static String formatTemperature(Context context, double temp) {
-        boolean isMetric = Utility.isMetric(context);
-        String tempString = Utility.formatTemperature(context, temp, isMetric);
-        return tempString;
-    }
 
-    private static String formatTemperature(Context context, double temperature, boolean isMetric) {
+    public static String formatTemperature(Context context, double temperature) {
         double temp;
-        if (!isMetric) {
+        if (!isMetric(context)) {
             temp = 9 * temperature / 5 + 32;
         } else {
             temp = temperature;

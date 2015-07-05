@@ -27,6 +27,7 @@ public class MasterActivity extends ActionBarActivity implements MasterFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SunshineSyncAdapter.initializeSyncAdapter(this);
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
