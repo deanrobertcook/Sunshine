@@ -1,4 +1,4 @@
-package com.example.android.sunshine.app.custom_view;
+package com.example.android.sunshine.app.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
