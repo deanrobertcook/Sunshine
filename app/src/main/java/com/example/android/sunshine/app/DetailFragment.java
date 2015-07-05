@@ -159,16 +159,32 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 cursor.getDouble(COL_WEATHER_MIN_TEMP));
         min.setText(minStr);
 
-        humidity.setText(cursor.getString(COL_HUMIDITY));
+        humidity.setText(humidity(cursor.getString(COL_HUMIDITY)));
 
-        wind.setText(cursor.getString(COL_WIND_SPEED));
+        wind.setText(wind(cursor.getString(COL_WIND_SPEED), cursor.getInt(COL_WIND_DEGREES)));
 
-        pressure.setText(cursor.getString(COL_PRESSURE));
+        pressure.setText(pressure(cursor.getString(COL_PRESSURE)));
 
         description.setText(cursor.getString(COL_WEATHER_DESC));
 
         int weatherId = cursor.getInt(COL_WEATHER_API_ID);
         image.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
+    }
+
+    private String humidity(String humidity) {
+        return String.format(getString(R.string.format_humidity), humidity);
+    }
+
+    private String wind(String speed, int degrees) {
+        int unitsResourceId = Utility.isMetric(getActivity()) ? R.string.meters_per_second : R.string.miles_per_hour;
+        String units = getString(unitsResourceId);
+        String direction = Utility.getBearing(degrees);
+        return String.format(getString(R.string.format_wind), speed, units, direction);
+    }
+
+    private String pressure(String pressure) {
+        String units = getString(R.string.hectopascals);
+        return String.format(getString(R.string.format_pressure), pressure, units);
     }
 
     @Override

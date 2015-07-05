@@ -218,4 +218,9 @@ public class Utility {
         }
         return -1;
     }
+
+    public static String getBearing(int degrees) {
+        String directions[] = {"N", "NE", "E", "SE", "S", "SW", "NW"};
+        return directions[ (int)Math.round((  ((double)degrees % 360) / 45)) ];
+    }
 }

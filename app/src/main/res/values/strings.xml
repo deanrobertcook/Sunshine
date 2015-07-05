@@ -32,12 +32,19 @@
     <!-- Date format for displaying day of week and date (i.e. Mon Jun 1) [CHAR LIMIT=20] -->
     <!-- these 'xliff' tags indicate that the value should not be translated? -->
     <string name="format_full_friendly_date"><xliff:g id="day">%1$s</xliff:g>, <xliff:g id="date">%2$s</xliff:g></string>
-    <!-- Temperature formats in degrees [CHAR LIMIT=NONE] -->
     <string name="format_temperature"><xliff:g id="temp">%1.0f</xliff:g>\u00B0</string>
+    <string name="format_humidity">Humidity: <xliff:g id="humidity">%1$s</xliff:g>%%</string>
+    <string name="format_wind">Wind speed: <xliff:g id="wind">%1$s%2$s %3$s</xliff:g></string>
+    <string name="format_pressure">Atmospheric pressure: <xliff:g id="pressure">%1$s%2$s</xliff:g></string>
 
     <string name="sync_account_type">sunshine.example.com</string>
     <string name="content_authority">com.example.android.sunshine.app</string>
     <string name="format_notification">Forecast: <xliff:g id="condition">%1$s</xliff:g> High: <xliff:g id="high">%2$s</xliff:g> Low: <xliff:g id="low">%3$s</xliff:g></string>
     <string name="pref_last_notification">last_notification</string>
+
+    <string name="meters_per_second">m/s</string>
+    <string name="miles_per_hour">mph</string>
+    <string name="hectopascals">hPa</string>
+
 
 </resources>
