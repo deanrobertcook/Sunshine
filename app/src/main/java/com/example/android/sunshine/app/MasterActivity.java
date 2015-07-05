@@ -3,7 +3,7 @@ package com.example.android.sunshine.app;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,10 +14,9 @@ import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 import timber.log.Timber;
 
 
-public class MasterActivity extends ActionBarActivity implements MasterFragment.ContainingActivity {
+public class MasterActivity extends AppCompatActivity implements MasterFragment.ContainingActivity {
 
     public static final String TAG = MasterActivity.class.getName();
-    public static final String USE_SPECIAL_DAY_KEY = "USE SPECIAL DAY";
 
     private static final String DETAIL_FRAGMENT_TAG = DetailFragment.class.getName();
 
