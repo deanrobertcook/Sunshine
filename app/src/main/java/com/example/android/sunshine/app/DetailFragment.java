@@ -9,12 +9,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -89,7 +85,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     public DetailFragment() {
-        setHasOptionsMenu(true);
     }
 
     public Uri getCurrentItemUri() {
@@ -98,16 +93,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
         return currentItemUri;
 
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuItem shareButton = menu.findItem(R.id.menu_item_share);
-        shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareButton);
-
-        if (shareActionProvider != null) {
-            shareActionProvider.setShareIntent(createShareIntent());
-        }
     }
 
     @Override
@@ -190,9 +175,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
-    public void onLocationChanged(String locationSetting) {
-        long date = WeatherContract.WeatherEntry.getDateFromUri(getCurrentItemUri());
-        currentItemUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationSetting, date);
+    public void onLocationChanged(Uri itemUri) {
+        currentItemUri = itemUri;
         getLoaderManager().restartLoader(DETAIL_FORECAST_LOADER_ID, null, this);
     }
 }

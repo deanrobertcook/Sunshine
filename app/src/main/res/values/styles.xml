@@ -28,20 +28,24 @@
 
     <!-- List Item styles -->
 
-    <style name="TodayListItemText">
+    <style name="TodayList">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="TodayListItemText" parent="TodayList">
         <item name="android:fontFamily">sans-serif-condensed</item>
         <item name="android:textAppearance">?android:textAppearanceLarge</item>
     </style>
 
-    <style name="TodayListItemMax">
+    <style name="TodayListItemMax" parent="TodayList">
         <item name="android:fontFamily">sans-serif-light</item>
-        <item name="android:textSize">@dimen/max_temperature_reading</item>
+        <item name="android:textSize">@dimen/text_size__list_item_max</item>
     </style>
 
-    <style name="TodayListItemMin">
+    <style name="TodayListItemMin" parent="TodayList">
         <item name="android:fontFamily">sans-serif-light</item>
-        <item name="android:textSize">@dimen/min_temperature_reading</item>
-        <item name="android:paddingLeft">@dimen/double_padding</item>
+        <item name="android:textSize">@dimen/text_size__list_item_min</item>
+        <item name="android:paddingLeft">@dimen/padding_double</item>
     </style>
 
     <style name="NormalListItemTop">
@@ -52,6 +56,27 @@
     <style name="NormalListItemBottom">
         <item name="android:fontFamily">sans-serif-condensed</item>
         <item name="android:textAppearance">?android:textAppearanceSmall</item>
+    </style>
+
+    <!-- Detail Fragment styles -->
+    <style name="DetailFragmentLargeText">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textAppearance">?android:textAppearanceLarge</item>
+    </style>
+
+    <style name="DetailFragmentSmallText">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textAppearance">?android:textAppearance</item>
+    </style>
+
+    <style name="DetailFragmentMax">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">@dimen/text_size__detail_max</item>
+    </style>
+
+    <style name="DetailFragmentMin">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">@dimen/text_size__detail_min</item>
     </style>
 
 </resources>

@@ -3,8 +3,8 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="horizontal"
-              android:paddingTop="@dimen/single_padding"
-              android:paddingBottom="@dimen/single_padding"
+              android:paddingTop="@dimen/padding_single"
+              android:paddingBottom="@dimen/padding_single"
               android:background="@drawable/touch_selector">
 
     <ImageView

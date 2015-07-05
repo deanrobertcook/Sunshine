@@ -15,17 +15,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv__detail_day"
-                android:padding="@dimen/detail_item_padding"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:id="@+id/tv__detail_date"
-                android:padding="@dimen/detail_item_padding"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+            <include layout="@layout/fragment_detail_day_info"/>
 
         </LinearLayout>
 
@@ -47,19 +37,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center">
 
-                    <TextView
-                        android:id="@+id/tv__detail_max"
-                        android:textSize="@dimen/detail_temp_text_size"
-                        android:padding="@dimen/detail_item_padding"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/tv__detail_min"
-                        android:textSize="@dimen/detail_temp_text_size"
-                        android:padding="@dimen/detail_item_padding"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                    <include layout="@layout/fragment_detail_temperature_info"/>
 
                 </LinearLayout>
 
@@ -82,32 +60,11 @@
 
                 </LinearLayout>
 
-
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/tv__detail_humidity"
-                android:padding="@dimen/detail_item_padding"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:id="@+id/tv__detail_wind"
-                android:padding="@dimen/detail_item_padding"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:id="@+id/tv__detail_pressure"
-                android:padding="@dimen/detail_item_padding"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
 
         </LinearLayout>
 
-
-
-
+        <include layout="@layout/fragment_detail_auxiliary_info"/>
 
     </LinearLayout>
 

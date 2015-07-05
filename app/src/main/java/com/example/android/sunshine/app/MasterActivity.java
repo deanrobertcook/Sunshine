@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.android.sunshine.app.data.WeatherContract;
+import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 
 import timber.log.Timber;
 
@@ -63,21 +65,11 @@ public class MasterActivity extends ActionBarActivity implements MasterFragment.
     protected void onResume() {
         super.onResume();
         String newLocation = Utility.getPreferredLocation(this);
-        if (currentLocation != null && currentLocation != newLocation) {
-            MasterFragment masterFragment = (MasterFragment)
-                    getSupportFragmentManager().findFragmentById(R.id.fragment_master);
-            if (masterFragment != null) {
-                masterFragment.onLocationChanged();
-            }
-
-            DetailFragment detailFragment = (DetailFragment)
-                    getSupportFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
-
-            if (detailFragment != null) {
-                detailFragment.onLocationChanged(newLocation);
-            }
-
-
+        if (currentLocation != null && !currentLocation.equals(newLocation)) {
+            Uri currentItemUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                    currentLocation, System.currentTimeMillis());
+            updateWeather();
+            setDetailFragment(currentItemUri);
             currentLocation = newLocation;
         }
     }
@@ -106,14 +98,25 @@ public class MasterActivity extends ActionBarActivity implements MasterFragment.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.action_view_location) {
-            sendUserToMaps();
+        switch (id) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.action_view_location:
+                sendUserToMaps();
+                break;
+            case R.id.action_refresh:
+                Log.d(TAG, "Refresh clicked");
+                updateWeather();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateWeather() {
+        SunshineSyncAdapter.syncImmediately(this);
     }
 
     private void sendUserToMaps() {
@@ -147,9 +150,18 @@ public class MasterActivity extends ActionBarActivity implements MasterFragment.
     }
 
     private void setDetailFragment(Uri itemUri) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.weather_detail_container,
-                        DetailFragment.newInstance(itemUri), DETAIL_FRAGMENT_TAG)
-                .commit();
+
+        DetailFragment detailFragment = (DetailFragment)
+                getSupportFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
+
+        if (detailFragment == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.weather_detail_container,
+                            DetailFragment.newInstance(itemUri),
+                            DETAIL_FRAGMENT_TAG)
+                    .commit();
+        } else {
+            detailFragment.onLocationChanged(itemUri);
+        }
     }
 }

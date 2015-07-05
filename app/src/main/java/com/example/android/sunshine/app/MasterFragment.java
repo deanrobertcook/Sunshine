@@ -9,9 +9,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -66,28 +63,11 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
 
         //returns 0 if nothing saved.
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_ITEM_KEY)) {
             savedItemPos = savedInstanceState.getInt(SELECTED_ITEM_KEY);
         }
-    }
-
-
-    private void updateWeather() {
-        String location = Utility.getPreferredLocation(getActivity());
-
-        new FetchWeatherTask(getActivity()).execute(location);
-    }
-
-    public void onLocationChanged() {
-        updateWeather();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.forecastfragment, menu);
     }
 
     @Override
@@ -100,14 +80,6 @@ public class MasterFragment extends Fragment implements LoaderManager.LoaderCall
     public void onDetach() {
         super.onDetach();
         this.container = null;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
-            updateWeather();
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

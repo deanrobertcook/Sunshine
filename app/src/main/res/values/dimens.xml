@@ -4,13 +4,14 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="text_size_1">28sp</dimen>
     <dimen name="text_size_2">20sp</dimen>
-    <dimen name="detail_item_padding">8dp</dimen>
     <dimen name="detail_temp_text_size">40sp</dimen>
-    <dimen name="single_padding">6dp</dimen>
-    <dimen name="double_padding">12dp</dimen>
+    <dimen name="padding_single">8dp</dimen>
+    <dimen name="padding_double">16dp</dimen>
     <dimen name="left_image_margin">60dp</dimen>
 
 
-    <dimen name="max_temperature_reading">72sp</dimen>
-    <dimen name="min_temperature_reading">36sp</dimen>
+    <dimen name="text_size__list_item_max">72sp</dimen>
+    <dimen name="text_size__list_item_min">36sp</dimen>
+    <dimen name="text_size__detail_max">96sp</dimen>
+    <dimen name="text_size__detail_min">48sp</dimen>
 </resources>
